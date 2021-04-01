@@ -17,21 +17,6 @@ const pool = new Pool({
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-// const getUserWithEmail = function(email) {
-//   let user;
-//   for (const userId in users) {
-//     user = users[userId];
-//     if (user.email.toLowerCase() === email.toLowerCase()) {
-//       break;
-//     } else {
-//       user = null;
-//     }
-//   }
-//   return Promise.resolve(user);
-// }
-// exports.getUserWithEmail = getUserWithEmail;
-
-// SQL Implementation of above function
 const getUserWithEmail = function(email) {
   return pool.query(`
   SELECT * FROM users
@@ -49,20 +34,11 @@ const getUserWithEmail = function(email) {
 
 exports.getUserWithEmail = getUserWithEmail;
 
-
-
-
 /**
  * Get a single user from the database given their id.
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-// const getUserWithId = function(id) {
-//   return Promise.resolve(users[id]);
-// }
-// exports.getUserWithId = getUserWithId;
-
-// SQL Implementation of above function
 const getUserWithId = function(id) {
   return pool.query(`
   SELECT * FROM users
@@ -84,17 +60,6 @@ exports.getUserWithId = getUserWithId;
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
-/* const addUser =  function(user) {
-  const userId = Object.keys(users).length + 1;
-  user.id = userId;
-  console.log("90", user.id);
-  users[userId] = user;
-  return Promise.resolve(user);
-}
-exports.addUser = addUser; */
-
-
-
 const addUser = function(user) {
   return pool.query(`
   INSERT INTO users (name, email, password)
@@ -113,7 +78,6 @@ const addUser = function(user) {
 exports.addUser = addUser;
 
 /// Reservations
-
 /**
  * Get all reservations for a single user.
  * @param {string} guest_id The id of the user.
