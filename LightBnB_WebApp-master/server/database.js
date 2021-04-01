@@ -113,7 +113,7 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
- const getAllProperties = function(options, limit = 10) {
+/*  const getAllProperties = function(options, limit = 10) {
   return pool.query(`
   SELECT * FROM properties
   LIMIT $1
@@ -121,9 +121,43 @@ exports.getAllReservations = getAllReservations;
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 }
+exports.getAllProperties = getAllProperties; */
 
+const getAllProperties = function(options, limit = 10) {
+  const queryParams = [];
+  let queryString = `
+  SELECT properties.id, title, cost_per_night, AVG(property_reviews.rating) AS average_rating
+  FROM properties
+  JOIN property_reviews ON property_id = properties.id
+  `
+  if (options.city) {
+    queryParams.push(`%${options.city}%`);
+    queryString += `WHERE city LIKE $${queryParams.length} `;
+  }
+  if (options.minimum_price_per_night) {
+    queryParams.push(`${options.minimum_price_per_night}`);
+    queryString += `AND cost_per_night > $${queryParams.length} `;
+  }
+  if (options.maximum_price_per_night) {
+    queryParams.push(`${options.maximum_price_per_night}`);
+    queryString += `AND cost_per_night < $${queryParams.length} `;
+  }
+  if (options.minimum_rating) {
+    queryParams.push(`${options.minimum_rating}`);
+    // queryString += `JOIN property_reviews ON property_id = properties.id`;
+    queryString += `AND property_reviews.rating >= $${queryParams.length} `;
+  }
+  queryParams.push(limit);
+  queryString += `
+  GROUP BY properties.id
+  ORDER BY cost_per_night
+  LIMIT $${queryParams.length};
+  `;
+  console.log("162", queryString, queryParams);
+  return pool.query(queryString, queryParams)
+  .then(res => res.rows);
+}
 exports.getAllProperties = getAllProperties;
-
 
 /**
  * Add a property to the database
