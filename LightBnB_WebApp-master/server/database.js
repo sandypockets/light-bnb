@@ -46,7 +46,6 @@ const getUserWithId = function(id) {
   `, [id])
   .then(res => {
     if (res.rows) {
-      console.log(res.rows[0])
       return res.rows[0];
     } else {
       return null;
@@ -116,7 +115,7 @@ exports.getAllReservations = getAllReservations;
 const getAllProperties = function(options, limit = 10) {
   const queryParams = [];
   let queryString = `
-  SELECT properties.id, title, cost_per_night, AVG(property_reviews.rating) AS average_rating
+  SELECT properties.id, title, cost_per_night * 100 AS cost_per_night, AVG(property_reviews.rating) AS average_rating
   FROM properties
   JOIN property_reviews ON property_id = properties.id
   `
@@ -135,6 +134,10 @@ const getAllProperties = function(options, limit = 10) {
   if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
     queryString += `AND property_reviews.rating >= $${queryParams.length} `;
+  }
+  if (options.owner_id) {
+    queryParams.push(`${options.owner_id}`);
+    queryString += `AND properties.owner_id = $${queryParams.length} `;
   }
   queryParams.push(limit);
   queryString += `
