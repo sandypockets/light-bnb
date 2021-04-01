@@ -134,7 +134,6 @@ const getAllProperties = function(options, limit = 10) {
   }
   if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
-    // queryString += `JOIN property_reviews ON property_id = properties.id`;
     queryString += `AND property_reviews.rating >= $${queryParams.length} `;
   }
   queryParams.push(limit);
@@ -143,7 +142,6 @@ const getAllProperties = function(options, limit = 10) {
   ORDER BY cost_per_night
   LIMIT $${queryParams.length};
   `;
-  console.log("162", queryString, queryParams);
   return pool.query(queryString, queryParams)
   .then(res => res.rows);
 }
